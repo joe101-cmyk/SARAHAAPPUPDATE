@@ -35,3 +35,6 @@ export const findbyid = async({model,select="",id,options ={}})=>{
 
     return await doc.exec();
 }
+export const create = async ({ model, data = [] }) => {
+    return await model.create(data);
+};

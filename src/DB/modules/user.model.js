@@ -39,6 +39,7 @@ const usersmodel= new mongoose.Schema({
         default:gendernum.Male,
     },
 
+
     privoder:{
     type:String,
     enum:Object.values(ProvideEnum),
@@ -46,7 +47,7 @@ const usersmodel= new mongoose.Schema({
     },
     confiememail:String,
     profilepublic:String,
-
+    changeTimecredintals:Date,
 }
 ,
 {timestamps:true,toJSON:{virtual:true},toObject:{virtual:true}})

@@ -1,14 +1,13 @@
 import { Token_Access_Key, refresh_Secret_Key } from "../../config/config.service.js";
 import { Tokentype as TokenTypeEnum } from "../../utils/enum/user.enum.js";
-import { badrequest, globelmiddlewarehandelar } from "../../utils/response/Error.response.js";
+import { badrequest } from "../../utils/response/Error.response.js";
 import { verifyToken } from "../../utils/token/token.js";
 import { findbyid } from "../DB/modules/DB.reposistry.js";
 import userModel from "../DB/modules/user.model.js";
 
-
 export const decodetoken = async ({
   authorizon,
-  tokenType = TokenTypeEnum.Access
+  tokenType = TokenTypeEnum.Acess
 }) => {
   const [Bearer, Token] = authorizon?.split(" ") || [];
 
@@ -18,7 +17,7 @@ export const decodetoken = async ({
 
   const decode = verifyToken({
     token: Token,
-    secretkey: tokenType === TokenTypeEnum.Access
+    secretkey: tokenType === TokenTypeEnum.Acess
       ? Token_Access_Key
       : refresh_Secret_Key
   });
@@ -32,7 +31,7 @@ export const decodetoken = async ({
   return { user, decode };
 };
 
-export const authentication = ({ tokenType = TokenTypeEnum.Access } = {}) => {
+export const authentication = ({ tokenType = TokenTypeEnum.Acess } = {}) => {
   return async (req, res, next) => {
     try {
       const { user, decode } = await decodetoken({
@@ -49,12 +48,15 @@ export const authentication = ({ tokenType = TokenTypeEnum.Access } = {}) => {
   };
 };
 
-
-export const authehorizion = ({accessrole = []} = {}) => {
+export const authehorizion = ({ accessrole = [] } = {}) => {
   return async (req, res, next) => {
-  if(!accessrole.includes(req.user.role)){
-    throw badrequest({message:"un authoroize Acess"})
+    try {
+      if (!accessrole.includes(req.user.role)) {
+        throw badrequest({ message: "UnAuthorized Access" });
+      }
+      return next();
+    } catch (error) {
+      return next(error);
+    }
   };
-  
 };
-}

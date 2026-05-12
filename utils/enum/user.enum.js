@@ -24,3 +24,11 @@ export const Tokentype  = {
     Acess:0,
     Refresh:1
 }
+
+
+
+export const logoutTypeEnum = {
+    logoutFromAll:"all",
+    logoutFromCurrent:"current"
+    
+}
