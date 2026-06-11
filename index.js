@@ -5,8 +5,8 @@ const app = express();
 await bootstrap(app,express)
 
 app.listen(PORT,()=>{
-        console.log(`RUNNING SERVER IN PORT NUMBER = ${PORT}`);
-
+                        console.log(`RUNNING SERVER IN PORT NUMBER = ${PORT}`);
+                
 })
 
 

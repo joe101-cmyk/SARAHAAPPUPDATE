@@ -32,13 +32,20 @@ import {
   create,
   findbyid,
   findone,
+  findoneandupdate,
+  updateone,
 } from "../../DB/modules/DB.reposistry.js";
 
 import usermodel from "../../DB/modules/user.model.js";
 import tokenmodel from "../../DB/modules/Token.js";
 
-import { v4 as uuidv4 } from "uuid";
+
 import { logoutTypeEnum } from "../../../utils/enum/user.enum.js";
+import { emailsubject, sendemail } from "../../../utils/email/email.ultils.js";
+import { GenerateOtp } from "../../../utils/OTP/generateotp.js";
+import { json } from "express";
+import { emitter } from "../../../utils/event/event.email.js";
+
 
 export const signup = async (req, res, next) => {
   try {
@@ -54,15 +61,23 @@ export const signup = async (req, res, next) => {
       plaintxt: password,
       Algo: hashEnum.Argon,
     });
-
+    const otp = GenerateOtp();
+      const hashotp = await generatehash({
+      plaintxt: JSON.stringify(otp),
+      Algo: hashEnum.Argon,
+    });
     const user = await usermodel.create({
       firstname,
       lastname,
       email,
       password: hashpassword,
       phone: encryptdata,
+        isVerified: false,
     });
-
+      emitter.emit("confirmEmail", {
+    email,
+    otp
+});
     return successResponse({
       res,
       statuscode: 201,
@@ -78,8 +93,13 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    const user = await findone({ model: usermodel, filter: { email } });
+const user = await findone({
+  model: usermodel,
+  filter: {
+    email,
+    isVerified: true,
+  },
+});
 
     if (!user) {
       throw NotFoundException({ message: "User Not Found" });
@@ -282,6 +302,155 @@ export const logoutwithredis = async (req, res, next) => {
       message: "Logout Success",
     });
 
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+
+
+export const confirmemail = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await findone({
+      model: usermodel,
+      filter: { email },
+    });
+
+    if (!user) {
+      throw NotFoundException({
+        message: "User Not Found",
+      });
+    }
+
+    const isvalidotp = await comparehash({
+      plaintxt: JSON.stringify(otp),
+      ciphertxt: user.otp,
+      Algo: hashEnum.Argon,
+    });
+
+    if (!isvalidotp) {
+      throw badrequest({
+        message: "Invalid OTP",
+      });
+    }
+
+    await updateone({
+      model: usermodel,
+      filter: { email },
+      data: {
+        isVerified: true,
+      },
+    });
+
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "Email Confirmed Successfully",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+export const forgetpassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const otp = GenerateOtp();
+
+    const hashotp = await generatehash({
+      plaintxt: JSON.stringify(otp),
+      Algo: hashEnum.Argon,
+    });
+
+    const user = await findoneandupdate({
+      model: usermodel,
+      filter: {
+        email,
+        isVerified: true,
+      },
+      data: {
+        otp: hashotp,
+      },
+    });
+
+    if (!user) {
+      throw NotFoundException({
+        message: "User Not Found",
+      });
+    }
+
+    emitter.emit("confirmEmail", {
+      email,
+      otp,
+    });
+
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "OTP Sent Successfully",
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+export const resetpassword = async (req, res, next) => {
+  try {
+    const { email, otp, newpassword } = req.body;
+
+    const user = await findone({
+      model: usermodel,
+      filter: {
+        email,
+        isVerified: true,
+      },
+    });
+
+    if (!user) {
+      throw NotFoundException({
+        message: "User Not Found",
+      });
+    }
+
+    const isvalidotp = await comparehash({
+      plaintxt: JSON.stringify(otp),
+      ciphertxt: user.otp,
+      Algo: hashEnum.Argon,
+    });
+
+    if (!isvalidotp) {
+      throw badrequest({
+        message: "Invalid OTP",
+      });
+    }
+
+    const hashpassword = await generatehash({
+      plaintxt: newpassword,
+      Algo: hashEnum.Argon,
+    });
+
+    await findoneandupdate({
+      model: usermodel,
+      filter: { email },
+      data: {
+        password: hashpassword,
+        $unset: {
+          otp: 1,
+        },
+      },
+    });
+
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "Password Reset Successfully",
+    });
   } catch (error) {
     return next(error);
   }

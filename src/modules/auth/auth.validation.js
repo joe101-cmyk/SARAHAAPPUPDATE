@@ -32,3 +32,13 @@ export const logoutschema = {
     logoutType: Joi.string().valid("logoutFromAll", "logoutFromCurrent", "all", "current").required(),
   }),
 };
+
+
+export const resetpasswordschema = {
+  body: Joi.object({
+    email: generalfiled.email,
+    newPassword: generalfiled.password,
+    confirmPassword: generalfiled.password,
+    token: Joi.string().required(),
+  }),
+};

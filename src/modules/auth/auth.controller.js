@@ -11,5 +11,6 @@ router.post("/login", validationmiddleware(authValidation.loginschema), authServ
 router.post("/refresh-token", validationmiddleware(authValidation.refreshschema), authService.refrashtoken);
 router.post("/logout", authentication(), authService.logout);
     router.post("/logout-redis", authentication(), authService.logoutwithredis);
-
+    router.post("/forgot-password", validationmiddleware(authValidation.forgotpasswordschema), authService.forgotpassword);
+    router.post("/reset-password", validationmiddleware(authValidation.resetpasswordschema), authService.resetpassword);
 export default router;
