@@ -18,4 +18,20 @@ router.patch("/uploads",
     userService.updateprofille
 );
 
+
+router.patch(
+  "/unfreeze",
+    authentication(),
+    userService.unfreezeUser
+);
+
+
+router.patch(
+    "/freeze",
+    authentication(),
+    userService.freezeUser
+);
+
+
+
 export default router;

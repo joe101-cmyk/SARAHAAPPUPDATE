@@ -37,8 +37,17 @@ export const logoutschema = {
 export const resetpasswordschema = {
   body: Joi.object({
     email: generalfiled.email,
-    newPassword: generalfiled.password,
+    otp: Joi.string().required(),
+    newpassword: generalfiled.password,
     confirmPassword: generalfiled.password,
-    token: Joi.string().required(),
+  }),
+};
+
+
+
+
+export const forgotpasswordschema = {
+  body: Joi.object({
+    email: generalfiled.email,
   }),
 };

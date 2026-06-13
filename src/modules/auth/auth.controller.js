@@ -13,4 +13,9 @@ router.post("/logout", authentication(), authService.logout);
     router.post("/logout-redis", authentication(), authService.logoutwithredis);
     router.post("/forgot-password", validationmiddleware(authValidation.forgotpasswordschema), authService.forgotpassword);
     router.post("/reset-password", validationmiddleware(authValidation.resetpasswordschema), authService.resetpassword);
-export default router;
+router.patch("/update-password", authentication(), authService.updatepassword);
+
+    export default router;
+
+
+

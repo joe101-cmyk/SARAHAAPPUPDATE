@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import {
   Expire_Token,
   redis_host,
@@ -41,9 +42,9 @@ import tokenmodel from "../../DB/modules/Token.js";
 
 
 import { logoutTypeEnum } from "../../../utils/enum/user.enum.js";
-import { emailsubject, sendemail } from "../../../utils/email/email.ultils.js";
+
 import { GenerateOtp } from "../../../utils/OTP/generateotp.js";
-import { json } from "express";
+
 import { emitter } from "../../../utils/event/event.email.js";
 
 
@@ -67,13 +68,14 @@ export const signup = async (req, res, next) => {
       Algo: hashEnum.Argon,
     });
     const user = await usermodel.create({
-      firstname,
-      lastname,
-      email,
-      password: hashpassword,
-      phone: encryptdata,
-        isVerified: false,
-    });
+  firstname,
+  lastname,
+  email,
+  password: hashpassword,
+  phone: encryptdata,
+  otp: hashotp,
+  isVerified: false,
+});
       emitter.emit("confirmEmail", {
     email,
     otp
@@ -93,13 +95,15 @@ export const signup = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-const user = await findone({
-  model: usermodel,
-  filter: {
-    email,
-    isVerified: true,
-  },
-});
+
+    const user = await findone({
+      model: usermodel,
+      filter: {
+        email,
+        // isVerified: true,
+        // isDeleted: false,
+      },
+    });
 
     if (!user) {
       throw NotFoundException({ message: "User Not Found" });
@@ -356,7 +360,7 @@ export const confirmemail = async (req, res, next) => {
 };
 
 
-export const forgetpassword = async (req, res, next) => {
+export const forgotpassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
@@ -384,7 +388,7 @@ export const forgetpassword = async (req, res, next) => {
       });
     }
 
-    emitter.emit("confirmEmail", {
+    emitter.emit("forgotPassword", {
       email,
       otp,
     });
@@ -455,3 +459,94 @@ export const resetpassword = async (req, res, next) => {
     return next(error);
   }
 };
+
+
+
+export const updatepassword = async (req, res, next) => {
+  try {
+    const { email, currentPassword, newPassword } = req.body;
+
+    const user = await findone({
+      model: usermodel,
+      filter: { email },
+    });
+
+    if (!user) {
+  throw NotFoundException({
+    message: "User Not Found",
+  });
+}
+    const isvalidpassword = await comparehash({
+      plaintxt: currentPassword,
+      ciphertxt: user.password,
+      Algo: hashEnum.Argon,
+    });
+    if (!isvalidpassword) {
+      throw badrequest({ message: "Invalid Current Password" });
+    }
+    const hashpassword = await generatehash({
+      plaintxt: newPassword,
+      Algo: hashEnum.Argon,
+    });
+    await findoneandupdate({
+      model: usermodel,
+      filter: { email },
+      data: { password: hashpassword },
+    });
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "Password Updated Successfully",
+    });
+  } catch (error) {
+    return next(error);
+  }
+
+  }
+
+  
+export const freezeUser = async (req, res, next) => {
+  try {
+
+    await updateone({
+      model: usermodel,
+      filter: { _id: req.user._id },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "User Frozen Successfully",
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+export const unfreezeUser = async (req, res, next) => {
+  try {
+
+    await updateone({
+      model: usermodel,
+      filter: { _id: req.user._id },
+      data: {
+        isDeleted: false,
+      },
+    });
+
+    return successResponse({
+      res,
+      statuscode: 200,
+      message: "User Restored Successfully",
+    });
+
+  } catch (error) {
+    return next(error);
+  }
+};
+

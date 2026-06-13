@@ -23,3 +23,69 @@ export const getProfile = async (req, res) => {
             data: req.file,  
         },
         )};
+
+
+       
+export const freezeUser = async (req, res, next) => {
+  try {
+    const user = await dbservice.findbyid({
+        model: userModel,
+        id: req.user._id,
+    });
+
+    if (!user) {
+        throw new Error("User Not Found");
+    }
+
+    await dbservice.updateone({
+        model: userModel,
+        filter: { _id: req.user._id },
+        data: {
+        isDeleted: true,
+        },
+    });
+
+    return successResponse({
+        res,
+        statuscode: 200,
+        message: "User Frozen Successfully",
+    });
+    } catch (error) {
+    return next(error);
+    }
+};
+
+export const unfreezeUser = async (req, res, next) => {
+    try {
+
+    const user = await dbservice.findbyid({
+        model: userModel,
+        id: req.user._id,
+    });
+
+    if (!user) {
+        throw new Error("User Not Found");
+    }
+
+    await dbservice.updateone({
+        model: userModel,
+        filter: { _id: req.user._id },
+        data: {
+        isDeleted: false,
+        },
+    });
+
+    return successResponse({
+        res,
+        statuscode: 200,
+        message: "User Restored Successfully",
+    });
+
+    } catch (error) {
+    return next(error);
+    }
+};
+
+
+
+
