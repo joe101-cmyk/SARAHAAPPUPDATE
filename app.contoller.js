@@ -5,6 +5,7 @@ import { authRouter, userRouter } from "./src/modules/index.js";
 import { sendemail } from "./utils/email/email.ultils.js";
 import {  globelmiddlewarehandelar, NotFoundException } from "./utils/response/Error.response.js";
 import { successResponse } from "./utils/response/sucess.response.js";
+import messageRouter from "./src/modules/message/message.controller.js";
 
 const bootstrap = async (app, express) => {
     await connect_DB();
@@ -24,7 +25,7 @@ app.all("/dummy", (req, res, next) => {
     );
 });
 
-
+    app.use("/message", messageRouter);
     app.use((req, res, next) => {
     return next(
         NotFoundException({ message: `Route ${req.originalUrl} Not Found` })

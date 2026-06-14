@@ -83,3 +83,43 @@ export const findoneandupdate = async ({
 
     return await doc.exec();
 };
+
+
+
+
+export const deleteone = async ({
+    model,
+    filter = {},
+} = {}) => {
+    return await model.deleteOne(filter);
+};
+
+export const deletebyid = async ({
+    model,
+    id,
+} = {}) => {
+    return await model.findByIdAndDelete(id);
+};
+
+export const deleteMany = async ({
+    model,
+    filter = {},
+} = {}) => {
+    return await model.deleteMany(filter);
+};
+
+export const find = async ({
+    model,
+    filter = {},
+    select = "",
+    populate = []
+}) => {
+
+    const query = model.find(filter).select(select);
+
+    if (populate.length) {
+        query.populate(populate);
+    }
+
+    return await query;
+};

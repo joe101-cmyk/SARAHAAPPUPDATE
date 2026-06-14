@@ -69,6 +69,28 @@ isDeleted: {
     profilepublic: String,
 
     changeTimecredintals: Date,
+
+    profilePic: {
+      type: String,
+      default: null,
+    },
+
+    coverPic: [
+      {
+        type: String,
+      },
+    ],
+
+    gallery: [
+      {
+        type: String,
+      },
+    ],
+
+    visitCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

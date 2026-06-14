@@ -1,0 +1,414 @@
+{
+  "info": {
+    "name": "Sarahah App - Assignment 12",
+    "description": "API endpoints for Assignment 12: Profile Picture Upload, Cover Picture Upload, Profile Visit Count",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Profile Picture Management",
+      "item": [
+        {
+          "name": "Upload Profile Picture",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profilePic",
+                  "type": "file",
+                  "src": "/path/to/profile/image.jpg",
+                  "description": "Profile picture file (single image)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/user/profile-picture",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user", "profile-picture"]
+            },
+            "description": "Upload a new profile picture. If user has existing profile picture, it will be moved to gallery array and replaced with new image."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/user/profile-picture",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "profile-picture"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Profile picture uploaded successfully\",\n  \"data\": {\n    \"profilePic\": \"uploads/users/507f1f77bcf86cd799439011/1234567890-123456789.jpg\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Profile Picture",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/profile-picture",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user", "profile-picture"]
+            },
+            "description": "Delete the user's profile picture from disk and database."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/user/profile-picture",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "profile-picture"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Profile picture deleted successfully\",\n  \"data\": {}\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cover Picture Management",
+      "item": [
+        {
+          "name": "Upload Cover Pictures (2 files)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "coverPic",
+                  "type": "file",
+                  "src": "/path/to/cover/image1.jpg",
+                  "description": "First cover picture (max 2 files)"
+                },
+                {
+                  "key": "coverPic",
+                  "type": "file",
+                  "src": "/path/to/cover/image2.jpg",
+                  "description": "Second cover picture (max 2 files)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/user/cover-pictures",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user", "cover-pictures"]
+            },
+            "description": "Upload cover pictures. Total cover pictures must equal 2. If user already has 1 cover picture, upload exactly 1. If user has 0, upload 2. If user has 2, cannot upload more."
+          },
+          "response": [
+            {
+              "name": "Success - Upload 2 New",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/user/cover-pictures",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "cover-pictures"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Cover pictures uploaded successfully\",\n  \"data\": {\n    \"coverPic\": [\n      \"uploads/users/507f1f77bcf86cd799439011/1234567890-111111111.jpg\",\n      \"uploads/users/507f1f77bcf86cd799439011/1234567890-222222222.jpg\"\n    ],\n    \"count\": 2\n  }\n}"
+            },
+            {
+              "name": "Error - Existing 2, Uploaded 1",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/user/cover-pictures",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "cover-pictures"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Invalid cover picture count. Existing: 2, Uploaded: 1, Total: 3. Total must equal 2.\",\n  \"stack\": \"...\",\n  \"status\": 400,\n  \"extra\": {\n    \"existingCount\": 2,\n    \"uploadedCount\": 1,\n    \"totalCount\": 3\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Cover Picture (1 file - when 1 exists)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "coverPic",
+                  "type": "file",
+                  "src": "/path/to/cover/image.jpg",
+                  "description": "Single cover picture (when 1 already exists)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/user/cover-pictures",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user", "cover-pictures"]
+            },
+            "description": "Upload 1 cover picture when user already has 1 existing cover picture. Total will be 2."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/user/cover-pictures",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "cover-pictures"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Cover pictures uploaded successfully\",\n  \"data\": {\n    \"coverPic\": [\n      \"uploads/users/507f1f77bcf86cd799439011/1234567890-111111111.jpg\",\n      \"uploads/users/507f1f77bcf86cd799439011/1234567890-333333333.jpg\"\n    ],\n    \"count\": 2\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Get Own Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user"]
+            },
+            "description": "Get current authenticated user's profile. For non-admin users, visitCount will not be included in response."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/user",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"done\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"firstname\": \"John\",\n      \"lastname\": \"Doe\",\n      \"email\": \"john@example.com\",\n      \"role\": 1,\n      \"profilePic\": \"uploads/users/507f1f77bcf86cd799439011/1234567890-111111111.jpg\",\n      \"coverPic\": [\n        \"uploads/users/507f1f77bcf86cd799439011/cover1.jpg\",\n        \"uploads/users/507f1f77bcf86cd799439011/cover2.jpg\"\n      ],\n      \"gallery\": [\n        \"uploads/users/507f1f77bcf86cd799439011/old-profile1.jpg\"\n      ],\n      \"visitCount\": 0\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Profile by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/507f1f77bcf86cd799439011",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["user", "507f1f77bcf86cd799439011"]
+            },
+            "description": "Get another user's profile by ID. This will increment their visitCount by 1. For non-admin users, visitCount will not be included in response."
+          },
+          "response": [
+            {
+              "name": "Success Response (Non-Admin User)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/user/507f1f77bcf86cd799439011",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "507f1f77bcf86cd799439011"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"done\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"firstname\": \"John\",\n      \"lastname\": \"Doe\",\n      \"email\": \"john@example.com\",\n      \"role\": 1,\n      \"profilePic\": \"uploads/users/507f1f77bcf86cd799439011/1234567890-111111111.jpg\",\n      \"coverPic\": [...],\n      \"gallery\": [...]\n    }\n  }\n}"
+            },
+            {
+              "name": "Success Response (Admin User)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/user/507f1f77bcf86cd799439011",
+                  "protocol": "http",
+                  "host": ["{{base_url}}"],
+                  "path": ["user", "507f1f77bcf86cd799439011"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"done\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"firstname\": \"John\",\n      \"lastname\": \"Doe\",\n      \"email\": \"john@example.com\",\n      \"role\": 1,\n      \"profilePic\": \"uploads/users/507f1f77bcf86cd799439011/1234567890-111111111.jpg\",\n      \"coverPic\": [...],\n      \"gallery\": [...],\n      \"visitCount\": 5\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "your_access_token_here",
+      "type": "string"
+    }
+  ]
+}
