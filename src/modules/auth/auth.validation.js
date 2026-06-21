@@ -39,7 +39,12 @@ export const resetpasswordschema = {
     email: generalfiled.email,
     otp: Joi.string().required(),
     newpassword: generalfiled.password,
-    confirmPassword: generalfiled.password,
+   confirmPassword: Joi.string()
+.required()
+.valid(Joi.ref("newpassword"))
+.messages({
+    "any.only":"Passwords do not match"
+}),
   }),
 };
 
@@ -51,3 +56,14 @@ export const forgotpasswordschema = {
     email: generalfiled.email,
   }),
 };
+
+
+
+export const confirmemailschema = {
+  body: Joi.object({
+    email: generalfiled.email,
+    otp: Joi.string().required()
+  })
+};
+
+

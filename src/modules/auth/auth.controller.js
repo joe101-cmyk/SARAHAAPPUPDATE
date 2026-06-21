@@ -14,6 +14,25 @@ router.post("/logout", authentication(), authService.logout);
     router.post("/forgot-password", validationmiddleware(authValidation.forgotpasswordschema), authService.forgotpassword);
     router.post("/reset-password", validationmiddleware(authValidation.resetpasswordschema), authService.resetpassword);
 router.patch("/update-password", authentication(), authService.updatepassword);
+// router.post(
+// "/confirm-email",
+// validationmiddleware(authVa),
+// authService.confirmemail
+// );
+
+router.patch(
+"/freeze-user",
+authentication(),
+authService.freezeUser
+);
+
+router.patch(
+"/unfreeze-user",
+authentication(),
+authService.unfreezeUser
+);
+
+
 
     export default router;
 

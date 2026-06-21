@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import { emailsubject, sendemail } from "../email/email.ultils.js";
 import { emailTemplate } from "../email/TempleteThml.js";
 
+
 export const emitter = new EventEmitter();
 
 emitter.on("confirmEmail", async (data) => {

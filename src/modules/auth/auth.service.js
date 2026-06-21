@@ -46,6 +46,7 @@ import { logoutTypeEnum } from "../../../utils/enum/user.enum.js";
 import { GenerateOtp } from "../../../utils/OTP/generateotp.js";
 
 import { emitter } from "../../../utils/event/event.email.js";
+import { redisClient } from "../../DB/redis.connection.js";
 
 
 export const signup = async (req, res, next) => {
@@ -281,7 +282,7 @@ export const logoutwithredis = async (req, res, next) => {
       throw badrequest({ message: "Token already expired" });
     }
 
-    const redisClient = redis_host();
+    
     const { logoutType } = req.body;
 
     if (
